@@ -2,6 +2,9 @@ from langchain_core.tools import tool
 from google import genai
 from google.genai import types
 import os
+from logger import setup_logger
+
+logger = setup_logger("vertex_transcribe")
 
 @tool
 def transcribe_audio(file_path: str) -> str:
@@ -14,14 +17,17 @@ def transcribe_audio(file_path: str) -> str:
     Returns:
         str: Transcription text.
     """
+    logger.info(f"Transcribing audio file: {file_path}")
     api_key = os.getenv("VERTEX_API_KEY")
     if not api_key:
+        logger.error("VERTEX_API_KEY not set")
         return "Error: VERTEX_API_KEY not set."
         
     client = genai.Client(api_key=api_key)
     
     try:
         if not os.path.exists(file_path):
+            logger.error(f"File not found: {file_path}")
             return f"Error: File {file_path} not found."
 
         with open(file_path, "rb") as f:
@@ -46,6 +52,8 @@ def transcribe_audio(file_path: str) -> str:
                 )
             ]
         )
+        logger.info("Transcription successful")
         return response.text
     except Exception as e:
+        logger.error(f"Error transcribing audio: {e}")
         return f"Error transcribing audio: {e}"

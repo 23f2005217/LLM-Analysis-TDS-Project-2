@@ -8,7 +8,11 @@ from langchain.chat_models import init_chat_model
 from langgraph.graph.message import add_messages
 import os
 from dotenv import load_dotenv
+from logger import setup_logger
+
 load_dotenv()
+
+logger = setup_logger("agent")
 
 if not os.getenv("GOOGLE_API_KEY"):
     os.environ["GOOGLE_API_KEY"] = os.getenv("GEMINI_API_KEY")
@@ -86,7 +90,9 @@ prompt = ChatPromptTemplate.from_messages([
 llm_with_prompt = prompt | llm
 
 def agent_node(state: AgentState):
+    logger.info("Agent invoked")
     result = llm_with_prompt.invoke({"messages": state["messages"]})
+    logger.info(f"Agent response: {result.content}")
     return {"messages": state["messages"] + [result]}
 
 def route(state):
@@ -98,6 +104,7 @@ def route(state):
         tool_calls = last.get("tool_calls")
 
     if tool_calls:
+        logger.info(f"Routing to tools: {tool_calls}")
         return "tools"
     content = None
     if hasattr(last, "content"):
@@ -106,8 +113,10 @@ def route(state):
         content = last.get("content")
 
     if isinstance(content, str) and content.strip() == "END":
+        logger.info("Agent stopping: END received")
         return END
     if isinstance(content, list) and content[0].get("text").strip() == "END":
+        logger.info("Agent stopping: END received")
         return END
     return "agent"
 graph = StateGraph(AgentState)
@@ -125,9 +134,10 @@ graph.add_conditional_edges(
 app = graph.compile()
 
 def run_agent(url: str) -> str:
+    logger.info(f"Starting agent for URL: {url}")
     app.invoke({
         "messages": [{"role": "user", "content": url}]},
         config={"recursion_limit": RECURSION_LIMIT},
     )
-    print("Tasks completed succesfully")
+    logger.info("Tasks completed successfully")
 

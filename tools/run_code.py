@@ -4,8 +4,11 @@ from langchain_core.tools import tool
 from dotenv import load_dotenv
 import os
 from google.genai import types
+from logger import setup_logger
+
 load_dotenv()
 client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+logger = setup_logger("run_code")
 
 def strip_code_fences(code: str) -> str:
     code = code.strip()
@@ -40,6 +43,7 @@ def run_code(code: str) -> dict:
         }
     """
     try: 
+        logger.info("Executing Python code")
         filename = "runner.py"
         os.makedirs("LLMFiles", exist_ok=True)
         with open(os.path.join("LLMFiles", filename), "w") as f:
@@ -53,6 +57,12 @@ def run_code(code: str) -> dict:
             cwd="LLMFiles"
         )
         stdout, stderr = proc.communicate()
+        
+        if proc.returncode != 0:
+            logger.error(f"Code execution failed with return code {proc.returncode}")
+            logger.error(f"Stderr: {stderr}")
+        else:
+            logger.info("Code execution successful")
 
         return {
             "stdout": stdout,
@@ -60,6 +70,7 @@ def run_code(code: str) -> dict:
             "return_code": proc.returncode
         }
     except Exception as e:
+        logger.error(f"Exception during code execution: {e}")
         return {
             "stdout": "",
             "stderr": str(e),

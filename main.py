@@ -7,8 +7,11 @@ from dotenv import load_dotenv
 import uvicorn
 import os
 import time
+from logger import setup_logger
 
 load_dotenv()
+
+logger = setup_logger("main")
 
 EMAIL = os.getenv("EMAIL") 
 SECRET = os.getenv("SECRET")
@@ -33,18 +36,22 @@ def healthz():
 async def solve(request: Request, background_tasks: BackgroundTasks):
     try:
         data = await request.json()
-    except Exception:
+    except Exception as e:
+        logger.error(f"JSON parse error: {e}")
         raise HTTPException(status_code=400, detail="Invalid JSON")
     if not data:
+        logger.error("Empty data received")
         raise HTTPException(status_code=400, detail="Invalid JSON")
     url = data.get("url")
     secret = data.get("secret")
     if not url or not secret:
+        logger.error("Missing url or secret")
         raise HTTPException(status_code=400, detail="Invalid JSON")
     
     if secret != SECRET:
+        logger.warning(f"Invalid secret provided: {secret}")
         raise HTTPException(status_code=403, detail="Invalid secret")
-    print("Verified starting the task...")
+    logger.info(f"Verified starting the task for URL: {url}")
     background_tasks.add_task(run_agent, url)
 
     return JSONResponse(status_code=200, content={"status": "ok"})
