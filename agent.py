@@ -54,7 +54,7 @@ GENERAL RULES:
 - NEVER shorten or modify URLs. Always submit the full URL.
 - NEVER re-submit unless the server explicitly allows or it's within the 3-minute limit.
 - ALWAYS inspect the server response before deciding what to do next.
-- ALWAYS use the tools provided to fetch, scrape, download, render HTML, or send requests.
+- ALWAYS use the tools provided to fetch, scrape, download, render HTML, send requests, or transcribe audio.
 
 TIME LIMIT RULES:
 - Each task has a hard 3-minute limit.
