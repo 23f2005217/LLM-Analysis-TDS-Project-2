@@ -55,7 +55,7 @@ STRICT RULES:
 GENERAL RULES:
 - NEVER stop early. Continue solving tasks until no new URL is provided.
 - NEVER hallucinate URLs, endpoints, fields, values, or JSON structure.
-- NEVER shorten or modify URLs. Always submit the full URL.
+- NEVER shorten or modify URLs. Always submit the full absolute URL (starting with http/https).
 - NEVER re-submit unless the server explicitly allows or it's within the 3-minute limit.
 - ALWAYS inspect the server response before deciding what to do next.
 - ALWAYS use the tools provided to fetch, scrape, download, render HTML, send requests, or transcribe audio.

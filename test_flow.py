@@ -11,7 +11,7 @@ def test_solve_endpoint():
     payload = {
         "email": os.getenv("EMAIL", "your_email"),
         "secret": os.getenv("SECRET", "your_secret"),
-        "url": "https://tds-llm-analysis.s-anand.net/demo"
+        "url": "https://tds-llm-analysis.s-anand.net/demo2"
     }
     
     print(f"Sending POST request to {url}")

@@ -27,8 +27,12 @@ def transcribe_audio(file_path: str) -> str:
     
     try:
         if not os.path.exists(file_path):
-            logger.error(f"File not found: {file_path}")
-            return f"Error: File {file_path} not found."
+            possible_path = os.path.join("LLMFiles", file_path)
+            if os.path.exists(possible_path):
+                file_path = possible_path
+            else:
+                logger.error(f"File not found: {file_path}")
+                return f"Error: File {file_path} not found."
 
         with open(file_path, "rb") as f:
             audio_bytes = f.read()
@@ -52,7 +56,7 @@ def transcribe_audio(file_path: str) -> str:
                 )
             ]
         )
-        logger.info("Transcription successful")
+        logger.info("Transcription successful",response.text)
         return response.text
     except Exception as e:
         logger.error(f"Error transcribing audio: {e}")
