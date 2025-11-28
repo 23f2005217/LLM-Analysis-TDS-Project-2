@@ -1,0 +1,1 @@
+https://console.cloud.google.com/vertex-ai/studio/settings/api-keys
